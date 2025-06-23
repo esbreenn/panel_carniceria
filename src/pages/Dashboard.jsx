@@ -1,29 +1,22 @@
 // src/pages/Dashboard.jsx
 import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-// useAuth ya no es necesario aquí para la funcionalidad single-user
-// import { useAuth } from "../hooks/useAuth";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTransactions } from "../hooks/useTransactions";
 import { useDailyCashStatus } from "../hooks/useDailyCashStatus";
 import TransactionForm from "../components/TransactionForm";
 import SummaryCards from "../components/SummaryCards";
 import TransactionsTable from "../components/TransactionsTable";
 import FinancialCharts from "../components/FinancialCharts";
-// aggregateTransactionsByDay ya no se importa aquí
-// import { aggregateTransactionsByDay } from "../utils/aggregateTransactions";
 import { exportToCsv } from "../utils/exportUtils";
 
 
 export default function Dashboard() {
-  // user ya no se desestructura de useAuth
-  // const { user } = useAuth();
-
-  // addTransaction se quita del destructuring porque no se usa en Dashboard
-  const { transactions, totals, updateTransaction, deleteTransaction } = useTransactions();
+  const { transactions, updateTransaction, deleteTransaction } = useTransactions();
   const { openingBalance, setDailyOpeningBalance, loading: loadingCashStatus, todayDateKey } = useDailyCashStatus();
 
   const [editingTransaction, setEditingTransaction] = useState(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [filterType, setFilterType] = useState('all');
   const [filterMethod, setFilterMethod] = useState('all');
@@ -32,10 +25,14 @@ export default function Dashboard() {
   const [filterDate, setFilterDate] = useState('today');
 
 
-  // dailyAggregatedData ya no se calcula ni se usa en Dashboard
-  // const dailyAggregatedData = useMemo(() => {
-  //   return aggregateTransactionsByDay(transactions);
-  // }, [transactions]);
+  React.useEffect(() => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      setFilterDate(dateParam);
+    } else {
+      setFilterDate('today');
+    }
+  }, [searchParams]);
 
 
   const todayTransactions = useMemo(() => {
@@ -87,6 +84,11 @@ export default function Dashboard() {
 
   const handleEditClick = (transaction) => {
     setEditingTransaction(transaction);
+    // ¡NUEVO! Scroll suave hacia arriba
+    window.scrollTo({
+      top: 0, // Desplazarse al inicio de la página
+      behavior: 'smooth' // Hacer el desplazamiento suave
+    });
   };
 
   const handleUpdateSubmit = async (id, updatedData) => {
@@ -125,7 +127,7 @@ export default function Dashboard() {
         txDate.setHours(0, 0, 0, 0);
         return txDate.getTime() === today.getTime();
       });
-    } else if (filterDate !== 'all') { // Si filterDate es una fecha específica de la URL
+    } else if (filterDate !== 'all') { // Si filterDate es una fecha específica (del calendario)
         const targetDate = new Date(filterDate);
         targetDate.setHours(0,0,0,0);
         tempTransactions = tempTransactions.filter(tx => {
@@ -159,6 +161,18 @@ export default function Dashboard() {
   const handleExportCsv = () => {
     exportToCsv(filteredAndSortedTransactions, `movimientos_financieros_${new Date().toLocaleDateString()}.csv`);
   };
+
+  // --- CÓDIGO SOLO PARA DEPURACIÓN ---
+  // NO OLVIDES BORRAR ESTO ANTES DE HACER TU GIT PUSH FINAL
+  window.dashboardVariables = {
+    transactions: transactions,
+    filterDate: filterDate,
+    todayTransactions: todayTransactions,
+    todayTotals: todayTotals,
+    filteredAndSortedTransactions: filteredAndSortedTransactions,
+  };
+  // --- FIN CÓDIGO SOLO PARA DEPURACIÓN ---
+
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
