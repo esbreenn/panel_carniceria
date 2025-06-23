@@ -1,8 +1,7 @@
 // src/pages/AuthPage.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-// Importa tu imagen de logo. Asegúrate de que la ruta y el nombre sean correctos.
-import logoCarniceriaBests from '../assets/logo_carniceria_bests.jpg'; //
+import logoCarniceriaBests from '../assets/logo_carniceria_bests.jpg';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -41,12 +40,11 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        {/* ¡NUEVO! Aquí se añade el logo */}
-        <div className="flex justify-center mb-6"> {/* Contenedor para centrar el logo */}
+        <div className="flex justify-center mb-6">
           <img
             src={logoCarniceriaBests}
             alt="Logo Carnicería Best's"
-            className="h-24 w-24 object-contain rounded-full border-2 border-gray-200" // Ajusta h- y w- para el tamaño, rounded-full si quieres que sea circular
+            className="h-24 w-24 object-contain rounded-full border-2 border-gray-200"
           />
         </div>
 
@@ -60,7 +58,7 @@ export default function AuthPage() {
             <input
               type="email"
               id="email"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:focus:border-blue-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -71,7 +69,7 @@ export default function AuthPage() {
             <input
               type="password"
               id="password"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:focus:border-blue-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

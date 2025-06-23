@@ -8,16 +8,16 @@ import {
 import { auth } from '../services/firebase';
 
 export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Se inicia como true
+  const [user, setUser] = useState(null); // 'user' vuelve a ser solo el objeto de usuario de Firebase Auth
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser); // currentUser será null o el objeto de usuario
-      setLoading(false); // La carga inicial ha terminado una vez que Firebase ha verificado
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => { // ¡REVERTIDO! Ya no es 'async'
+      setUser(currentUser);
+      setLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, []); // ¡REVERTIDO! Sin dependencias extra
 
   const login = async (email, password) => {
     try {

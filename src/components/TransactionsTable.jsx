@@ -1,7 +1,7 @@
 // src/components/TransactionsTable.jsx
 import React from "react";
 
-export default function TransactionsTable({ transactions, onEdit, onDelete }) { // ¡MODIFICADO! Recibe onEdit y onDelete
+export default function TransactionsTable({ transactions, onEdit, onDelete }) {
   if (!transactions.length) {
     return <p className="text-center text-gray-500">No hay movimientos aún.</p>;
   }
@@ -15,8 +15,8 @@ export default function TransactionsTable({ transactions, onEdit, onDelete }) { 
             <th className="px-4 py-2 text-left">Tipo</th>
             <th className="px-4 py-2 text-left">Método</th>
             <th className="px-4 py-2 text-left">Monto</th>
-            <th className="px-4 py-2 text-left">Descripción</th> {/* ¡NUEVA COLUMNA! */}
-            <th className="px-4 py-2 text-left">Acciones</th> {/* ¡NUEVA COLUMNA! */}
+            <th className="px-4 py-2 text-left">Descripción</th>
+            <th className="px-4 py-2 text-left">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -26,16 +26,16 @@ export default function TransactionsTable({ transactions, onEdit, onDelete }) { 
               <td className="px-4 py-2 capitalize">{tx.type}</td>
               <td className="px-4 py-2 capitalize">{tx.method}</td>
               <td className="px-4 py-2">${tx.amount.toFixed(2)}</td>
-              <td className="px-4 py-2">{tx.description || '-'}</td> {/* Muestra descripción */}
+              <td className="px-4 py-2">{tx.description || '-'}</td>
               <td className="px-4 py-2 flex space-x-2">
                 <button
-                  onClick={() => onEdit(tx)} // Llama a onEdit con la transacción completa
+                  onClick={() => onEdit(tx)}
                   className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600"
                 >
                   Editar
                 </button>
                 <button
-                  onClick={() => onDelete(tx.id)} // Llama a onDelete con el ID
+                  onClick={() => onDelete(tx.id)}
                   className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
                 >
                   Eliminar

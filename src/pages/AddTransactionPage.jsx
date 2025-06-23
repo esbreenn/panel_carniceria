@@ -1,28 +1,41 @@
 // src/pages/AddTransactionPage.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Para volver al dashboard
+import { useNavigate } from "react-router-dom";
+// useAuth ya no es necesario aquí para la funcionalidad single-user
+// import { useAuth } from "../hooks/useAuth";
 import TransactionForm from "../components/TransactionForm";
-import { useTransactions } from "../hooks/useTransactions"; // Necesitamos el hook para la función addTransaction
+import { useTransactions } from "../hooks/useTransactions";
+
 
 export default function AddTransactionPage() {
-  const { addTransaction } = useTransactions();
+  // carniceriaId ya no es necesario
+  // const { user } = useAuth();
+  // const carniceriaId = user?.carniceriaId;
+
+  const { addTransaction } = useTransactions(); // ¡REVERTIDO! Ya no pasa carniceriaId
   const navigate = useNavigate();
 
-  // Función que se llama cuando se envía el formulario para añadir
   const handleAddSubmit = async (transactionData) => {
     await addTransaction(transactionData);
-    alert("¡Movimiento añadido exitosamente!"); // Mensaje de confirmación
-    navigate("/dashboard"); // Redirigir de vuelta al dashboard
+    alert("¡Movimiento añadido exitosamente!");
+    navigate("/dashboard");
   };
+
+  // ¡REVERTIDO! Ya no necesitamos el mensaje de cargando carniceriaId aquí
+  // if (!carniceriaId) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+  //       <p className="text-xl font-semibold text-gray-700">Cargando datos de la carnicería o usuario no configurado...</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Añadir Nuevo Movimiento</h1>
+      <h1 className="text-2xl font-bold">Añadir Nuevo Movimiento</h1> {/* ¡REVERTIDO! Sin carniceriaId en el título */}
 
       <TransactionForm
         onSubmit={handleAddSubmit}
-        // En esta página, TransactionForm solo se usará para AÑADIR.
-        // Por lo tanto, no le pasamos transactionToEdit, onUpdate ni onCancelEdit.
       />
 
       <button

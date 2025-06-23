@@ -1,4 +1,4 @@
-/* src/components/SummaryCards.jsx */
+// src/components/SummaryCards.jsx
 import React from "react";
 
 export default function SummaryCards({ ingresos, egresos, balance, byMethod }) {

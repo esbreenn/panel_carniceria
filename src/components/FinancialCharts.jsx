@@ -1,5 +1,6 @@
 // src/components/FinancialCharts.jsx
 import React from 'react';
+// ¡CORREGIDO! 'from' en lugar de '=>'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -19,8 +20,7 @@ export default function FinancialCharts({ totals, chartType }) {
     <div className="bg-white p-4 rounded shadow">
       <h2 className="text-xl font-bold mb-2 text-center">Análisis Visual</h2>
 
-      {/* Renderizar solo el gráfico de pastel si chartType es 'pie' */}
-      {chartType === 'pie' && (
+      {chartType === 'pie' && ( // Gráfico de torta para Dashboard
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-center mb-2">Ingresos por Método</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -46,8 +46,7 @@ export default function FinancialCharts({ totals, chartType }) {
         </div>
       )}
 
-      {/* Renderizar solo el gráfico de barras si chartType es 'bar' */}
-      {chartType === 'bar' && (
+      {chartType === 'bar' && ( // Gráfico de barras para Calendario
         <div>
           <h3 className="text-lg font-semibold text-center mb-2">Ingresos vs Egresos</h3>
           <ResponsiveContainer width="100%" height={250}>

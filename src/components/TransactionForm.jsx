@@ -1,50 +1,44 @@
 // src/components/TransactionForm.jsx
 import React, { useState, useEffect } from "react";
 
-// transactionToEdit será el objeto de la transacción si estamos editando, o null si estamos añadiendo.
-// onUpdate será la función que se llamará al guardar cambios en modo edición.
-// onSubmit será la función que se llamará al añadir en modo añadir.
-// onCancelEdit es opcional, para cerrar el formulario de edición.
-export default function TransactionForm({ transactionToEdit, onSubmit, onUpdate, onCancelEdit }) {
+export default function TransactionForm({ transactionToEdit, onSubmit, onUpdate, onCancelEdit }) { // SIN scannedData
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("ingreso");
   const [method, setMethod] = useState("efectivo");
-  const [description, setDescription] = useState(""); // ¡NUEVO! Estado para la descripción
+  const [description, setDescription] = useState("");
 
-  // useEffect para cargar los datos de la transacción si estamos en modo edición
   useEffect(() => {
     if (transactionToEdit) {
-      setAmount(transactionToEdit.amount.toString()); // Convertir a string para el input type="number"
+      setAmount(transactionToEdit.amount.toString());
       setType(transactionToEdit.type);
       setMethod(transactionToEdit.method);
-      setDescription(transactionToEdit.description || ""); // Carga la descripción, o vacío si no existe
+      setDescription(transactionToEdit.description || "");
     } else {
-      // Limpiar el formulario si no estamos editando (volviendo al modo añadir)
       setAmount("");
       setType("ingreso");
       setMethod("efectivo");
       setDescription("");
     }
-  }, [transactionToEdit]); // Se ejecuta cuando transactionToEdit cambia
+  }, [transactionToEdit]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!amount) return;
 
-    const transactionData = { amount: parseFloat(amount), type, method, description }; // Incluye description
+    const transactionData = { amount: parseFloat(amount), type, method, description };
 
     if (transactionToEdit) {
-      // Si estamos editando, llamamos a onUpdate
       onUpdate(transactionToEdit.id, transactionData);
     } else {
-      // Si estamos añadiendo, llamamos a onSubmit
       onSubmit(transactionData);
+      setAmount(""); // Resetear formulario después de añadir
+      setType("ingreso");
+      setMethod("efectivo");
+      setDescription("");
     }
-    // No reseteamos el formulario aquí, se reseteará por el useEffect
-    // cuando transactionToEdit sea null (después de cerrar edición)
   };
 
-  const isEditing = !!transactionToEdit; // Determina si estamos en modo edición
+  const isEditing = !!transactionToEdit;
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow space-y-4">
@@ -65,7 +59,7 @@ export default function TransactionForm({ transactionToEdit, onSubmit, onUpdate,
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Descripción (Opcional)</label> {/* ¡NUEVO CAMPO! */}
+        <label className="block text-sm font-medium">Descripción (Opcional)</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -109,7 +103,7 @@ export default function TransactionForm({ transactionToEdit, onSubmit, onUpdate,
         {isEditing ? "Guardar Cambios" : "Añadir Movimiento"}
       </button>
 
-      {isEditing && ( // Botón de cancelar solo en modo edición
+      {isEditing && (
         <button
           type="button"
           onClick={onCancelEdit}

@@ -1,9 +1,9 @@
 // src/hooks/useTransactions.js
 import { useState, useEffect, useCallback } from "react";
-import { ref, onValue, push, serverTimestamp, remove, update } from "firebase/database"; // ¡NUEVO! Importa remove y update
+import { ref, onValue, push, serverTimestamp, remove, update } from "firebase/database";
 import { db } from "../services/firebase";
 
-export function useTransactions() {
+export function useTransactions() { // ¡REVERTIDO! Ya no recibe carniceriaId
   const [transactions, setTransactions] = useState([]);
   const [totals, setTotals] = useState({
     ingresos: 0,
@@ -13,10 +13,12 @@ export function useTransactions() {
   });
 
   useEffect(() => {
+    // ¡REVERTIDO! La ruta es simplemente "transactions"
     const txRef = ref(db, "transactions");
     return onValue(txRef, (snapshot) => {
       const data = snapshot.val() || {};
       const list = Object.entries(data).map(([id, tx]) => ({ id, ...tx }));
+
       setTransactions(list);
 
       const agg = list.reduce(
@@ -35,25 +37,25 @@ export function useTransactions() {
       const balance = agg.ingresos - agg.egresos;
       setTotals({ ...agg, balance });
     });
-  }, []);
+  }, []); // ¡REVERTIDO! Sin dependencia de carniceriaId
 
-  const addTransaction = useCallback(async ({ amount, type, method, description }) => { // ¡MODIFICADO! Añade description
+  const addTransaction = useCallback(async ({ amount, type, method, description }) => {
+    // ¡REVERTIDO! La ruta es simplemente "transactions"
     const txRef = ref(db, "transactions");
-    await push(txRef, { amount, type, method, description, timestamp: serverTimestamp() }); // Guarda description
-  }, []);
+    await push(txRef, { amount, type, method, description, timestamp: serverTimestamp() });
+  }, []); // Sin dependencia de carniceriaId
 
-  // ¡NUEVO! Función para actualizar una transacción
-  const updateTransaction = useCallback(async (id, { amount, type, method, description }) => { // ¡MODIFICADO! Añade description
+  const updateTransaction = useCallback(async (id, { amount, type, method, description }) => {
+    // ¡REVERTIDO! La ruta es simplemente "transactions"
     const txRef = ref(db, `transactions/${id}`);
-    await update(txRef, { amount, type, method, description }); // Guarda description
-  }, []);
+    await update(txRef, { amount, type, method, description });
+  }, []); // Sin dependencia de carniceriaId
 
-  // ¡NUEVO! Función para eliminar una transacción
   const deleteTransaction = useCallback(async (id) => {
+    // ¡REVERTIDO! La ruta es simplemente "transactions"
     const txRef = ref(db, `transactions/${id}`);
     await remove(txRef);
-  }, []);
+  }, []); // Sin dependencia de carniceriaId
 
-
-  return { transactions, totals, addTransaction, updateTransaction, deleteTransaction }; // ¡MODIFICADO! Exporta las nuevas funciones
+  return { transactions, totals, addTransaction, updateTransaction, deleteTransaction };
 }

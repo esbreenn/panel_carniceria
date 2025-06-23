@@ -2,16 +2,23 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CalendarView from "../components/CalendarView";
+// ¡MODIFICADO! Elimina 'addTransaction', 'updateTransaction', 'deleteTransaction' del destructuring
+// Solo necesitamos 'transactions' y 'totals' para los cálculos y gráficos
 import { useTransactions } from "../hooks/useTransactions";
 import { aggregateTransactionsByDay, aggregateTransactionsByMonth } from "../utils/aggregateTransactions";
-import FinancialCharts from "../components/FinancialCharts"; // Importa FinancialCharts
+import FinancialCharts from "../components/FinancialCharts";
+import TransactionsTable from "../components/TransactionsTable";
+import TransactionForm from "../components/TransactionForm";
 
 
 export default function CalendarPage() {
-  const { transactions, totals } = useTransactions(); // Obtenemos transactions y totals para los gráficos
+  // ¡MODIFICADO! Solo obtenemos lo que se usa: transactions, totals (para gráficos), updateTransaction, deleteTransaction
+  const { transactions, totals, updateTransaction, deleteTransaction } = useTransactions();
   const navigate = useNavigate();
 
   const [calendarDisplayDate, setCalendarDisplayDate] = useState(new Date());
+  const [selectedDateForHistory, setSelectedDateForHistory] = useState(null);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
 
   const dailyAggregatedData = useMemo(() => {
@@ -28,11 +35,56 @@ export default function CalendarPage() {
   }, [monthlyAggregates, currentMonthKey]);
 
 
+  const handleDayClick = (dateKey) => {
+    setSelectedDateForHistory(dateKey);
+    setEditingTransaction(null);
+  };
+
+  const transactionsForSelectedDay = useMemo(() => {
+    if (!selectedDateForHistory) {
+      return [];
+    }
+    const [year, month, day] = selectedDateForHistory.split('-').map(Number);
+    const targetDateUTC = new Date(Date.UTC(year, month - 1, day));
+
+    return transactions.filter(tx => {
+      const txDate = new Date(tx.timestamp);
+      const txYearUTC = txDate.getUTCFullYear();
+      const txMonthUTC = txDate.getUTCMonth();
+      const txDayUTC = txDate.getUTCDate();
+      const txDateUTC = new Date(Date.UTC(txYearUTC, txMonthUTC, txDayUTC));
+      return txDateUTC.getTime() === targetDateUTC.getTime();
+    }).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [transactions, selectedDateForHistory]);
+
+
+  const handleEditClick = (transaction) => {
+    setEditingTransaction(transaction);
+  };
+
+  const handleUpdateSubmit = async (id, updatedData) => {
+    await updateTransaction(id, updatedData);
+    setEditingTransaction(null);
+    alert("¡Movimiento actualizado exitosamente!");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTransaction(null);
+  };
+
+  const handleDeleteClick = async (id) => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar este movimiento?")) {
+      await deleteTransaction(id);
+      alert("¡Movimiento eliminado!");
+      setEditingTransaction(null);
+    }
+  };
+
+
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Vista de Calendario y Resúmenes Diarios</h1>
 
-      {/* Tarjetas de Resumen del MES ACTUAL DEL CALENDARIO */}
       <div className="bg-white p-4 rounded shadow">
         <h2 className="text-lg font-semibold">Resumen del Mes: {getMonthName(calendarDisplayDate.getMonth())} {calendarDisplayDate.getFullYear()}</h2>
         <div className="grid grid-cols-3 gap-4 mt-2">
@@ -53,12 +105,14 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {/* Gráfico de Barras de Ingresos vs Egresos (¡MOVIMIENTO AQUÍ!) */}
-      <FinancialCharts totals={totals} chartType="bar" /> {/* Pasa chartType="bar" */}
+      <FinancialCharts totals={totals} chartType="bar" />
 
-      <CalendarView dailyTotalsData={dailyAggregatedData} onMonthChange={setCalendarDisplayDate} />
+      <CalendarView
+        dailyTotalsData={dailyAggregatedData}
+        onMonthChange={setCalendarDisplayDate}
+        onDateClick={handleDayClick}
+      />
 
-      {/* Tabla de Balances Mensuales (todos los meses) */}
       <div className="bg-white p-4 rounded shadow space-y-4">
         <h2 className="text-xl font-bold mb-2">Historial de Balances Mensuales</h2>
         {monthlyAggregates.length === 0 ? (
@@ -89,6 +143,27 @@ export default function CalendarPage() {
         )}
       </div>
 
+      {selectedDateForHistory && (
+        <div className="bg-white p-4 rounded shadow space-y-4">
+          <h2 className="text-xl font-bold mb-2">Movimientos del Día: {selectedDateForHistory}</h2>
+          {editingTransaction && (
+            <div className="my-4">
+              <TransactionForm
+                transactionToEdit={editingTransaction}
+                onUpdate={handleUpdateSubmit}
+                onCancelEdit={handleCancelEdit}
+              />
+            </div>
+          )}
+          <TransactionsTable
+            transactions={transactionsForSelectedDay}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+          />
+        </div>
+      )}
+
+
       <button
         onClick={() => navigate("/dashboard")}
         className="mt-6 bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400"
@@ -99,7 +174,6 @@ export default function CalendarPage() {
   );
 }
 
-// Función auxiliar para obtener el nombre del mes (si no la tienes ya en un utils)
 const getMonthName = (monthIndex) => {
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',

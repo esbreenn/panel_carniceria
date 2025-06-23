@@ -7,15 +7,13 @@ export default function HeaderWithAuth() {
   const { user, logout } = useAuth();
   const location = useLocation();
 
-  // Determinar si el botón de cerrar sesión debe ser visible
   const showLogoutButton = user &&
                            location.pathname !== '/auth' &&
                            location.pathname !== '/add-transaction' &&
-                           location.pathname !== '/calendar'; // ¡MODIFICADO! Añade esta condición
+                           location.pathname !== '/calendar';
 
   return (
     <>
-      {/* Botón de Logout condicional */}
       {showLogoutButton && (
         <button
           onClick={logout}
@@ -24,7 +22,6 @@ export default function HeaderWithAuth() {
           Cerrar Sesión
         </button>
       )}
-      {/* Aquí podrías añadir otros elementos de una cabecera global si los necesitas en el futuro */}
     </>
   );
 }

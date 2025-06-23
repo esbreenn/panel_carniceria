@@ -1,21 +1,25 @@
 // src/App.jsx
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-// ¡ELIMINADO! Ya NO necesitamos importar useLocation aquí.
-// import { useLocation } from "react-router-dom";
-
 import Dashboard from "./pages/Dashboard";
 import AuthPage from "./pages/AuthPage";
 import AddTransactionPage from "./pages/AddTransactionPage";
 import CalendarPage from "./pages/CalendarPage";
 import PrivateRoute from "./components/PrivateRoute";
 import { useAuth } from "./hooks/useAuth";
-import HeaderWithAuth from "./components/HeaderWithAuth"; // ¡IMPORTANTE! Importa tu nuevo componente
+import HeaderWithAuth from "./components/HeaderWithAuth";
+
+// ¡REVERTIDO! Las importaciones para la configuración inicial de DB se quitan de aquí
+// import { ref, set, get } from "firebase/database";
+// import { db } from "./services/firebase";
 
 
 export default function App() {
   const { user, loading } = useAuth();
-  // ¡ELIMINADO! La llamada a useLocation() YA NO VA AQUÍ.
-  // const location = useLocation();
+
+  // ¡REVERTIDO! El useEffect para crear user_carniceria_map se quita
+  // useEffect(() => { /* ... */ }, [user]);
+
 
   if (loading) {
     return (
@@ -27,9 +31,6 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      {/* ¡ESTE ES EL CAMBIO CLAVE!
-          Renderiza el componente HeaderWithAuth AQUÍ, dentro de BrowserRouter.
-          HeaderWithAuth ahora es el que usa useLocation() de forma correcta. */}
       <HeaderWithAuth />
 
       <Routes>
@@ -37,7 +38,6 @@ export default function App() {
 
         <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/auth" replace />} />
 
-        {/* Rutas protegidas por PrivateRoute */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/add-transaction" element={<AddTransactionPage />} />

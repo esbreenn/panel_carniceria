@@ -1,7 +1,6 @@
 // src/components/CalendarView.jsx
-import React, { useState, useMemo, useEffect } from 'react'; // ¡MODIFICADO! Añade useEffect
+import React, { useState, useMemo, useEffect } from 'react';
 
-// Función auxiliar para obtener el nombre del mes (si ya la tienes en un utils, elimínala de aquí)
 const getMonthName = (monthIndex) => {
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -10,13 +9,12 @@ const getMonthName = (monthIndex) => {
   return months[monthIndex];
 };
 
-// Función para generar los días de un mes en una cuadrícula de calendario
 const generateCalendarDays = (year, monthIndex) => {
   const firstDayOfMonth = new Date(year, monthIndex, 1);
   const lastDayOfMonth = new Date(year, monthIndex + 1, 0);
 
   const numDaysInMonth = lastDayOfMonth.getDate();
-  const firstDayOfWeek = firstDayOfMonth.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+  const firstDayOfWeek = firstDayOfMonth.getDay();
 
   const startOffset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
 
@@ -40,25 +38,20 @@ const generateCalendarDays = (year, monthIndex) => {
   return days;
 };
 
-// ¡MODIFICADO! Ahora recibe onMonthChange
 export default function CalendarView({ dailyTotalsData, onDateClick, onMonthChange }) {
-  const [currentDate, setCurrentDate] = useState(new Date()); // Estado interno para el mes/año del calendario
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // Notificar al padre cada vez que el mes del calendario cambia
   useEffect(() => {
     if (onMonthChange) {
       onMonthChange(currentDate);
     }
-  }, [currentDate, onMonthChange]); // Se ejecuta cuando currentDate cambia
+  }, [currentDate, onMonthChange]);
 
-
-  // Generar los días del calendario para el mes actual
   const daysInMonth = useMemo(() => generateCalendarDays(year, month), [year, month]);
 
-  // Navegación de meses
   const goToPreviousMonth = () => {
     setCurrentDate(prevDate => {
       const newDate = new Date(prevDate);
@@ -84,7 +77,6 @@ export default function CalendarView({ dailyTotalsData, onDateClick, onMonthChan
     <div className="bg-white p-4 rounded shadow space-y-4">
       <h2 className="text-xl font-bold mb-2 text-center">Calendario de Movimientos</h2>
 
-      {/* Navegación del Calendario */}
       <div className="flex justify-between items-center mb-4">
         <button onClick={goToPreviousMonth} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">&lt; Anterior</button>
         <span className="text-lg font-semibold">
@@ -96,7 +88,6 @@ export default function CalendarView({ dailyTotalsData, onDateClick, onMonthChan
         <button onClick={goToCurrentMonth} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Hoy</button>
       </div>
 
-      {/* Días de la Semana */}
       <div className="grid grid-cols-7 text-center font-medium text-gray-700 border-b pb-2">
         <span>Lun</span>
         <span>Mar</span>
@@ -107,7 +98,6 @@ export default function CalendarView({ dailyTotalsData, onDateClick, onMonthChan
         <span>Dom</span>
       </div>
 
-      {/* Cuadrícula del Calendario */}
       <div className="grid grid-cols-7 gap-1">
         {daysInMonth.map((dayData, index) => (
           <div
